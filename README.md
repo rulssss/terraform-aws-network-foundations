@@ -36,6 +36,7 @@ In this phase, a basic AWS network was built to understand how Terraform works.
 
 Learn:
 
+* Modularization
 * How Terraform creates resources
 * Dependencies between components
 * Basic `.tf` file structure
