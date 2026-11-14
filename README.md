@@ -42,7 +42,6 @@ Learn:
 
 ### ⚠️ Limitations
 
-* Monolithic code (no modules)
 * No environment separation
 * Local state
 * No automation
