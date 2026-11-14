@@ -1,66 +1,39 @@
 # 🌐 Terraform AWS Networking Lab (Dev & Prod)
 
-Infraestructura base en AWS utilizando Terraform, con separación de entornos (**dev** y **prod**), estado remoto en S3 y despliegue automático mediante GitHub Actions.
+Base infrastructure on AWS using Terraform, featuring environment separation (**dev** and **prod**), remote state in S3, and automated deployment via GitHub Actions.
 
 ---
 
-## 📌 Objetivo
+## 📌 Objective
 
-Este proyecto implementa una red base en AWS siguiendo buenas prácticas:
+This project implements a foundational network on AWS following best practices:
 
-* Uso de **módulos reutilizables**
-* Separación de entornos (`dev` y `prod`)
-* Estado remoto con **S3 + DynamoDB (locking)**
-* CI/CD con GitHub Actions
-* Despliegue automático en `dev` y controlado en `prod`
-
----
-
-## 🧱 Infraestructura creada
-
-* VPC
-* Subnets públicas y privadas
-* Internet Gateway (IGW)
-* Route Tables
-* Security Groups
-
-⚠️ No se utiliza NAT Gateway para evitar costos.
+- Use of **reusable modules**
+- Environment separation (`dev` and `prod`)
+- Remote state with **S3 + DynamoDB (locking)**
+- CI/CD with GitHub Actions
+- Automated deployment in `dev` and controlled deployment in `prod`
 
 ---
 
-## 📁 Estructura del proyecto
+## 🧱 Infrastructure Created
 
-```
-aws-state-remote-and-environments/
-├── environments/
-│   ├── dev/
-│   │   └── main.tf
-│   └── prod/
-│       ├── main.tf
-│       └── variables.tf
-├── modules/
-│   ├── vpc/
-│   ├── subnets/
-│   ├── routing/
-│   └── security-group/
-├── bootstrap/
-│   └── main.tf   # crea S3 + DynamoDB (backend)
-└── .github/
-    └── workflows/
-        ├── terraform.yml       # DEV
-        └── terraform-prod.yml  # PROD
-```
+- VPC
+- Public and private subnets
+- Internet Gateway (IGW)
+- Route Tables
+- Security Groups
 
----
+⚠️ NAT Gateway is not used to avoid costs.
 
-## ⚙️ Backend (Estado remoto)
+## ⚙️ Backend (Remote State)
 
-Terraform guarda el estado en:
+Terraform stores the state in:
 
-* 🪣 S3 → almacenamiento del state
-* 🔒 DynamoDB → locking (evita ejecuciones simultáneas)
+- 🪣 S3 → state storage
+- 🔒 DynamoDB → locking (prevents concurrent executions)
 
-### Inicialización del backend
+### Backend Initialization
 
 ```bash
 cd bootstrap
@@ -68,76 +41,75 @@ terraform init
 terraform apply
 ```
 
-Esto crea:
+This creates:
 
-* bucket S3
-* tabla DynamoDB
-
----
-
-## 🚀 Cómo desplegar
+- S3 bucket
+- DynamoDB table
 
 ---
 
-### 🟢 DEV (automático)
+## 🚀 How to Deploy
 
-#### Qué lo dispara
+---
 
-* Cambios en:
+### 🟢 DEV (Automated)
 
+#### Trigger
+
+- Changes in:
   * `modules/`
   * `environments/dev/`
 
-#### Flujo
+#### Workflow
 
 ```text
 Commit → GitHub Actions → terraform apply (dev)
 ```
 
-#### Características
+#### Characteristics
 
-* Automático
-* Sin aprobación
-* Entorno de prueba
+- Automated
+- No approval required
+- Testing environment
 
 ---
 
-### 🔴 PROD (controlado)
+### 🔴 PROD (Controlled)
 
-#### Qué lo dispara
+#### Trigger
 
-* Cambios en:
+- Changes in:
 
 ```text
 environments/prod/
 ```
 
-#### Flujo
+#### Workflow
 
 ```text
-Cambio intencional → Push → GitHub Actions → Approval → Apply
+Intentional change → Push → GitHub Actions → Approval → Apply
 ```
 
-#### Características
+#### Characteristics
 
-* Requiere aprobación manual
-* No se despliega automáticamente con cambios en módulos
-* Representa entorno real
+- Requires manual approval
+- Does not deploy automatically when module files change
+- Represents a real production environment
 
 ---
 
-## 🧠 Cómo promover cambios a producción
+## 🧠 How to Promote Changes to Production
 
-1. Hacer cambios en `modules/`
-2. Verificar en DEV (deploy automático)
-3. Actualizar PROD con un cambio real, por ejemplo:
+1. Make changes in `modules/`
+2. Verify in DEV (automated deploy)
+3. Update PROD with an intentional change, for example:
 
 ```hcl
 release_version = "v2"
 ```
 
-4. Hacer push
-5. Aprobar el deploy en GitHub Actions
+4. Push changes
+5. Approve the deployment in GitHub Actions
 
 ---
 
@@ -145,15 +117,14 @@ release_version = "v2"
 
 ### DEV Workflow
 
-* Ejecuta:
-
+- Executes:
   * `terraform init`
   * `terraform plan`
   * `terraform apply`
 
-* Se activa con cambios en:
+- Triggered by changes in:
 
-  ```
+  ```text
   modules/**
   environments/dev/**
   ```
@@ -162,32 +133,31 @@ release_version = "v2"
 
 ### PROD Workflow
 
-* Ejecuta:
-
+- Executes:
   * `terraform init`
   * `terraform plan`
-  * (espera aprobación)
+  * (waits for approval)
   * `terraform apply`
 
-* Se activa con cambios en:
+- Triggered by changes in:
 
-  ```
+  ```text
   environments/prod/**
   ```
 
 ---
 
-## ⚠️ Buenas prácticas implementadas
+## ⚠️ Best Practices Implemented
 
-* ❌ No aplicar cambios en PROD desde local
-* ✅ Uso de módulos reutilizables
-* ✅ Separación de entornos por estado
-* ✅ CI/CD para despliegues
-* ✅ Control manual en producción
+- ❌ Do not apply changes to PROD from a local machine
+- ✅ Use of reusable modules
+- ✅ Environment separation via state
+- ✅ CI/CD for deployments
+- ✅ Manual control in production
 
 ---
 
-## 🧪 Destruir infraestructura
+## 🧪 Destroy Infrastructure
 
 ### DEV
 
@@ -206,37 +176,37 @@ terraform destroy
 
 ---
 
-## 💸 Costos
+## 💸 Costs
 
-Este proyecto evita recursos costosos:
+This project avoids costly resources:
 
-* ❌ NAT Gateway
-* ❌ EC2
+- ❌ NAT Gateway
+- ❌ EC2
 
-👉 Infraestructura prácticamente gratuita (solo networking)
-
----
-
-## 🧠 Conceptos aplicados
-
-* Infrastructure as Code (IaC)
-* Terraform Modules
-* Remote State
-* Environment Separation
-* CI/CD pipelines
-* GitHub Actions
-* Cloud Networking (AWS)
+👉 Virtually free infrastructure (networking only)
 
 ---
 
-## 🚀 Resultado
+## 🧠 Concepts Applied
 
-* Infraestructura reproducible
-* Separación clara entre dev y prod
-* Flujo de despliegue similar a entornos reales de empresa
+- Infrastructure as Code (IaC)
+- Terraform Modules
+- Remote State
+- Environment Separation
+- CI/CD Pipelines
+- GitHub Actions
+- Cloud Networking (AWS)
 
 ---
 
-## 👤 Autor
+## 🚀 Outcome
 
-Proyecto realizado como práctica de Terraform y AWS para nivel profesional.
+- Reproducible infrastructure
+- Clear separation between dev and prod
+- Deployment workflow similar to real enterprise environments
+
+---
+
+## 👤 Author
+
+Project built as a hands-on Terraform and AWS practice at a professional level.
